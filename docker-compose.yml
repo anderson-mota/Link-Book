@@ -4,13 +4,13 @@
 version: "3.1"
 services:
 
-    memcached:
-      image: memcached:alpine
-      container_name: link-book-memcached
-
-    redis:
-      image: redis:alpine
-      container_name: link-book-redis
+#    memcached:
+#      image: memcached:alpine
+#      container_name: link-book-memcached
+#
+#    redis:
+#      image: redis:alpine
+#      container_name: link-book-redis
 
     mysql:
       image: mysql:5.7
@@ -26,9 +26,9 @@ services:
       ports:
         - "8003:3306"
 
-    elasticsearch:
-      image: elasticsearch:5.4-alpine
-      container_name: link-book-elasticsearch
+#    elasticsearch:
+#      image: elasticsearch:5.4-alpine
+#      container_name: link-book-elasticsearch
 
     webserver:
       image: nginx:alpine
@@ -44,7 +44,7 @@ services:
       build: phpdocker/php-fpm
       container_name: link-book-php-fpm
       working_dir: /application
+#      command: tail -f var/log/dev.log var/log/test.log
       volumes:
         - .:/application
         - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.2/fpm/conf.d/99-overrides.ini
-
