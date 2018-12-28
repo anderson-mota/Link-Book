@@ -15,12 +15,4 @@ class LinkController extends AbstractController
     {
         return new JsonResponse;
     }
-
-    /**
-     * @Route("/anylink", name="anylink")
-     */
-    public function any()
-    {
-        return new JsonResponse;
-    }
 }

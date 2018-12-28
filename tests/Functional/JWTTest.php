@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Functional\Tests;
+namespace App\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 class JWTTest extends WebTestCase
 {
     private const ROUTE = '/api/link';
+    private const username = 'mota';
+    private const password = 'test';
 
     /**
      * @param $username
@@ -21,14 +23,19 @@ class JWTTest extends WebTestCase
      */
     private function requestLogin($username, $password)
     {
+        $credentials = [
+            'username' => $username,
+            'password' => $password,
+        ];
+
         $client = static::createClient();
         $client->request(
             'POST',
             '/api/login_check',
-            [
-                'username' => $username,
-                'password' => $password,
-            ]
+            [],
+            [],
+            [],
+            json_encode($credentials)
         );
 
         return $client;
@@ -41,36 +48,37 @@ class JWTTest extends WebTestCase
      * @param string $password
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
-    protected function createAuthenticatedClient($username = 'mota', $password = 'test')
+    protected function createAuthenticatedClient($username = self::username, $password = self::password)
     {
         $client = $this->requestLogin($username, $password);
-
         $data = json_decode($client->getResponse()->getContent(), true);
 
         $client = static::createClient();
-        $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+
+        if (isset($data['token'])) {
+            $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+        }
 
         return $client;
     }
 
     public function testGetToken()
     {
-        $username = 'mota';
-        $password = 'test';
+        $username = self::username;
+        $password = self::password;
 
         $client = $this->requestLogin($username, $password);
         $data = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
-        $this->assertJsonResponse(Response::HTTP_OK, $client->getResponse());
         $this->assertArrayHasKey('token', $data);
-        $this->assertSame(3, count(explode('.', $data)));
+        $this->assertSame(3, count(explode('.', $data['token'])));
     }
 
     public function testAuthorized()
     {
         $client = $this->createAuthenticatedClient();
-        $crawler = $client->request('GET', self::ROUTE);
+        $client->request('GET', self::ROUTE);
 
         $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
     }
@@ -78,7 +86,7 @@ class JWTTest extends WebTestCase
     public function testNotAuthorized()
     {
         $client = $this->createAuthenticatedClient('another_user', 'any_pass');
-        $crawler = $client->request('GET', self::ROUTE);
+        $client->request('GET', self::ROUTE);
 
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
     }
@@ -86,7 +94,7 @@ class JWTTest extends WebTestCase
     public function testWithoutToken()
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', self::ROUTE);
+        $client->request('GET', self::ROUTE);
 
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
     }
