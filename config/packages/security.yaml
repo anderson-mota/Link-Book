@@ -1,24 +1,22 @@
 security:
-#    encoders:
-#        App\Entity\User:
-#            algorithm: argon2i
-
     encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
+        App\Entity\User:
+#            algorithm: argon2i
+            algorithm: 'argon2i'
+            cost: 12
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory:
-            memory:
-                users:
-                    mota:
-                        password: test
-                        roles: 'IS_AUTHENTICATED_FULLY'
+#        in_memory:
+#            memory:
+#                users:
+#                    mota:
+#                        password: test
+#                        roles: 'IS_AUTHENTICATED_FULLY'
         # used to reload user from session & other features (e.g. switch_user)
-#        app_user_provider:
-#            entity:
-#                class: App\Entity\User
-#                property: email
+        app_user_provider:
+            entity:
+                class: App\Entity\User
     firewalls:
         login:
             pattern:  ^/api/login

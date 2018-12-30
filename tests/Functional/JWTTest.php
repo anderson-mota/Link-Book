@@ -13,8 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 class JWTTest extends WebTestCase
 {
     private const ROUTE = '/api/link';
-    private const username = 'mota';
-    private const password = 'test';
+    private const username = 'anderson.mota12@gmail.com';
+    private const password = '1234';
 
     /**
      * @param $username

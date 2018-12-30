@@ -23,6 +23,8 @@ services:
         - MYSQL_DATABASE=linkbook
         - MYSQL_USER=linkbook
         - MYSQL_PASSWORD=1234
+      expose:
+        - "3306"
       ports:
         - "8003:3306"
 
@@ -35,8 +37,8 @@ services:
       container_name: link-book-webserver
       working_dir: /application
       volumes:
-          - .:/application
-          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+        - .:/application
+        - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       ports:
        - "8001:80"
 
@@ -44,7 +46,15 @@ services:
       build: phpdocker/php-fpm
       container_name: link-book-php-fpm
       working_dir: /application
-#      command: tail -f var/log/dev.log var/log/test.log
       volumes:
         - .:/application
         - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.2/fpm/conf.d/99-overrides.ini
+
+    startup:
+      image: phpdockerio/php72-fpm:latest
+      depends_on:
+        - php-fpm
+      working_dir: /application
+      entrypoint: /application/entrypoint.sh
+      volumes:
+        - .:/application
