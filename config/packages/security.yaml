@@ -1,9 +1,7 @@
 security:
     encoders:
         App\Entity\User:
-#            algorithm: argon2i
             algorithm: 'argon2i'
-            cost: 12
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
@@ -17,6 +15,8 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
+                property: email
+        # used to reload user from session & other features (e.g. switch_user)
     firewalls:
         login:
             pattern:  ^/api/login
